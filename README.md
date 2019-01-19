@@ -29,4 +29,4 @@ $ cat /sys/bus/w1/devices/28-XXXXXXXXXXXX/w1_slave
 `
 $ cd InfluxDB/ && bash install.sh
 `
-You should be able to open: http://192.168.0.134:8083<br>
+You should be able to open: http://<ip>:8083<br>
