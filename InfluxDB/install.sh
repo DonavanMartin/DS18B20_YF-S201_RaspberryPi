@@ -8,4 +8,4 @@ sudo systemctl start influxdb
 sudo netstat -naptu | grep LISTEN | grep influxd
 curl -G 'http://localhost:8086/query?pretty=true' --data-urlencode "q=SHOW DATABASES"
 sudo systemctl restart influxdb
-
+curl -G 'http://localhost:8086/query' --data-urlencode "q=CREATE DATABASE measurement"
