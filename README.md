@@ -23,9 +23,3 @@ You can test with this command <br>
 `
 $ cat /sys/bus/w1/devices/28-XXXXXXXXXXXX/w1_slave
 `
-
-## Backend 
-todo...
-
-## Frontend
-todo...
