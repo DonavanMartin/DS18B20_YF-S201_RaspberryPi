@@ -23,3 +23,14 @@ You can test with this command <br>
 `
 $ cat /sys/bus/w1/devices/28-XXXXXXXXXXXX/w1_slave
 `
+
+## InfluxDB
+
+`
+$ cd InfluxDB/ && bash install.sh
+`
+
+Go to: http://192.168.0.134:8083 and execute this query:<br>
+`
+CREATE DATABASE "measurement"
+`
