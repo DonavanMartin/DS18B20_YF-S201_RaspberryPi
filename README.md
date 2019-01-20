@@ -11,7 +11,9 @@ The DS18B20 project can be use as a RaspberryPi temperature sensor example.
 ## PiOLED
 You can install PiOLED via this command line:<br>
 `
-$ cd PiOLED/ && bash install.sh
+$ cd PiOLED/ && bash install.sh `<br>
+`
+-->Enable I2C interface when 'raspi-config' interface pop up.
 `
 <br>For testing, see examples in folder:<br>
 `
@@ -35,3 +37,11 @@ $ cd InfluxDB/ && bash install.sh
 `
 <br>You should be now able to open:<br>
 http://localhost:8083<br>
+
+## Grafana
+You can install Grafana via this command line:<br>
+`
+$ cd Grafana/ && bash install.sh
+`
+<br>You should be now able to open:<br>
+http://localhost:3000<br>
