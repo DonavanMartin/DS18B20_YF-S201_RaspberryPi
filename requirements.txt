@@ -3,6 +3,7 @@
 # Serial Communication
 pyserial
 onewire
+RPi.GPIO
 #
 # User Interface
 # tkinter
