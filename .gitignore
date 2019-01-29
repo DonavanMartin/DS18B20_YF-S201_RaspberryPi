@@ -2,7 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
+PiOLED/Adafruit_Python_SSD1306/
 # C extensions
 *.so
 
