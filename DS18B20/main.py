@@ -1,36 +1,11 @@
 #!/usr/bin/env python
-
 import os
 import glob
 import time
 import sys
 from datetime import datetime
-from ConfigParser import SafeConfigParser
-
-CONFIG = 'ds18b20.ini'
+from sendJSON import ..InfluxDB.DBconnection
 INFLUX_ENABLE = 'no'
-INFLUX_URL = ''
-INFLUX_USER = ''
-INFLUX_PASS = ''
-INFLUX_DB = ''
-INFLUX_PORT = ''
-
-cfg = SafeConfigParser({
-  'influxdb_enable': INFLUX_ENABLE,
-  'influxdb_url': INFLUX_URL,
-  'influxdb_user': INFLUX_USER,
-  'influxdb_pass': INFLUX_PASS,
-  'influxdb_db': INFLUX_DB,
-  'influxdb_port': INFLUX_PORT
-  })
-
-cfg.read(CONFIG)
-INFLUX_ENABLE = cfg.get('influxdb', 'influxdb_enable')
-INFLUX_URL = cfg.get('influxdb', 'influxdb_url')
-INFLUX_USER = cfg.get('influxdb', 'influxdb_user')
-INFLUX_PASS = cfg.get('influxdb', 'influxdb_pass')
-INFLUX_DB = cfg.get('influxdb', 'influxdb_db')
-INFLUX_PORT = cfg.get('influxdb', 'influxdb_port')
 
 os.system('modprobe w1-gpio')
 os.system('modprobe w1-therm')
@@ -38,11 +13,12 @@ os.system('modprobe w1-therm')
 base_dir = '/sys/bus/w1/devices/'
 device_folder = glob.glob(base_dir + '28*')
 
+# Display number of devices
 nb_device = len(device_folder)
 print "Number of devives: {0}".format(nb_device)
 
 # Creates a list containing device list with  ['Directory folder, "type", "serial"]
-device = [[0 for x in range(3)] for y in range(nb_device)] 
+device = [[0 for x in range(3)] for y in range(nb_device)]
 for x in range(0,nb_device):
   print(x)
   device[x][0] = device_folder[x] + '/w1_slave'
@@ -51,10 +27,6 @@ for x in range(0,nb_device):
   print(device[x][0])
   print(device[x][1])
   print(device[x][2])
-
-if INFLUX_ENABLE == 'yes':
-  from influxdb import InfluxDBClient
-  idb_client = InfluxDBClient(INFLUX_URL, INFLUX_PORT, INFLUX_USER, INFLUX_PASS, INFLUX_DB)
 
 def convert_from_raw(raw):
   '''
@@ -102,7 +74,7 @@ try:
           }]
 
           # Send data to InfluxDB
-          idb_client.write_points(json_body)
+          sendJSON(json_body)
 
     # Take a nap for a sec
     time.sleep(1)
