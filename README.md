@@ -59,9 +59,9 @@ $ cat Grafana/telemetry.json
 $ sudo nano /etc/rc.local
 `
 <br>Add lines before "exit 0":<br>
-`python :~/DS18B20_YF-S201_RaspberryPi/DS18B20/main.py &`<br>
-`python :~/DS18B20_YF-S201_RaspberryPi/YF-S201/main.py &`
-
+`python /home/pi/DS18B20_YF-S201_RaspberryPi/DS18B20/main.py &`<br>
+`python /home/pi/DS18B20_YF-S201_RaspberryPi/YF-S201/main.py &`<br>
+[more info](https://www.raspberrypi.org/documentation/linux/usage/rc-local.md)
 
 ## PiOLED
 ### Install
