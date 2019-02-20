@@ -1,5 +1,5 @@
 # DS18B20_YF-S201_RaspberryPi
-This project can be use as a RaspberryPi temperature sensor and water flow meter example. 
+This project can be use as a RaspberryPi temperature sensor(DS18B20) and water flow meter(YF-S201) example. 
 
 ## YF-S201
 ### Rasperry Pi pinout:
@@ -8,7 +8,7 @@ This project can be use as a RaspberryPi temperature sensor and water flow meter
 8  - Data (flowmeter1)<br>
 10 - Data (flowmeter2)<br>
 
-Run<br>
+### Run
 `
 $ cd YF-S201 && python main.py -pin 8
 `
