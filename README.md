@@ -2,7 +2,7 @@
 This project can be use as a RaspberryPi temperature sensor(DS18B20) and water flow meter(YF-S201) example. 
 
 ## YF-S201
-### Rasperry Pi pinout:
+### Rasperry Pi pinout
 2 - 5volts<br>
 6 - GND<br>
 8  - Data (flowmeter1)<br>
@@ -23,7 +23,7 @@ $ cd DS18B20/ && bash install.sh
 $ cat /sys/bus/w1/devices/28-XXXXXXXXXXXX/w1_slave
 `
 
-Rasperry Pi pinout:<br>
+### Rasperry Pi pinout
 1 - 3.3volts<br>
 6 - GND<br>
 7 - Data<br>
