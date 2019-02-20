@@ -4,8 +4,15 @@ import glob
 import time
 import sys
 from datetime import datetime
-from sendJSON import ..InfluxDB.DBconnection
-INFLUX_ENABLE = 'no'
+import os
+
+#DBConnection
+scriptPath = os.path.realpath(os.path.dirname(sys.argv[0]))
+os.chdir(scriptPath)
+sys.path.append("../InfluxDB")
+import DBconnection
+
+INFLUX_ENABLE = 'yes'
 
 os.system('modprobe w1-gpio')
 os.system('modprobe w1-therm')
@@ -15,7 +22,7 @@ device_folder = glob.glob(base_dir + '28*')
 
 # Display number of devices
 nb_device = len(device_folder)
-print "Number of devives: {0}".format(nb_device)
+print("Number of devives: {0}".format(nb_device))
 
 # Creates a list containing device list with  ['Directory folder, "type", "serial"]
 device = [[0 for x in range(3)] for y in range(nb_device)]
@@ -56,7 +63,7 @@ try:
   while True:
     for x in range(0,nb_device):
         ext_temp = read_ext_temp(device[x][0])
-        print "Serial:{0} --  Type:{1} --  Temp C: {2} -- Temp F: {3}".format(device[x][2],device[x][1],ext_temp, convert_to_f(ext_temp))
+        print( "Serial:{0} --  Type:{1} --  Temp C: {2} -- Temp F: {3}".format(device[x][2],device[x][1],ext_temp, convert_to_f(ext_temp)))
 
         if INFLUX_ENABLE == 'yes':
           # Format JSON for sending to InfluxDB
@@ -74,10 +81,10 @@ try:
           }]
 
           # Send data to InfluxDB
-          sendJSON(json_body)
+          DBconnection.sendJSON(json_body)
 
     # Take a nap for a sec
     time.sleep(1)
 except KeyboardInterrupt:
-  print "Terminating program"
+  print("Terminating program")
   sys.exit()
