@@ -54,7 +54,7 @@ This file is a dashboard example:<br>
 $ cat Grafana/telemetry.json
 `
 
-### Start at boot
+## Start at boot
 `
 $ sudo nano /etc/rc.local
 `
