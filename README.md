@@ -1,25 +1,6 @@
 # DS18B20_RaspberryPi
 The DS18B20 project can be use as a RaspberryPi temperature sensor example. 
 
-## Installation
-1. Install the project libraries
-`xargs sudo apt install <libraries.txt`
-
-2. Install the python requirements
-`pip3 install -r requirements.txt`
-
-## PiOLED
-You can install PiOLED via this command line:<br>
-`
-$ cd PiOLED/ && bash install.sh `<br>
-`
--->Enable I2C interface when 'raspi-config' interface pop up.
-`
-<br>For testing, see examples in folder:<br>
-`
-$ ls Adafruit_Python_SSD1306/examples
-`
-
 ## DS18B20
 You can install DS18B20 via this command line:<br>
 `
@@ -45,3 +26,20 @@ $ cd Grafana/ && bash install.sh
 `
 <br>You should be now able to open:<br>
 http://localhost:3000<br>
+
+This file is a dashboard example:<br>
+`
+$ cat Grafana/telemetry.json
+`
+
+## PiOLED
+You can install PiOLED via this command line:<br>
+`
+$ cd PiOLED/ && bash install.sh `<br>
+`
+-->Enable I2C interface when 'raspi-config' interface pop up.
+`
+<br>For testing, see examples in folder:<br>
+`
+$ ls Adafruit_Python_SSD1306/examples
+`
