@@ -8,8 +8,7 @@ Rasperry Pi pinout:<br>
 8  - Data (flowmeter1)<br>
 10 - Data (flowmeter2)<br>
 
-
-<br>Run<br>
+Run<br>
 `
 $ cd YF-S201 && python main.py -pin 8
 `
@@ -29,7 +28,7 @@ Rasperry Pi pinout:<br>
 6 - GND<br>
 7 - Data<br>
 
-<br>Run<br>
+Run<br>
 `
 $ cd DS18B20 && python main.py
 `
