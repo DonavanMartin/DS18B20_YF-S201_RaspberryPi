@@ -54,6 +54,15 @@ This file is a dashboard example:<br>
 $ cat Grafana/telemetry.json
 `
 
+### Start at boot
+`
+$ sudo nano /etc/rc.local <br>
+Add line:
+`
+`python :~/DS18B20_YF-S201_RaspberryPi/DS18B20/main.py &`
+`python :~/DS18B20_YF-S201_RaspberryPi/YF-S201/main.py &`
+
+
 ## PiOLED
 ### Install
 `
