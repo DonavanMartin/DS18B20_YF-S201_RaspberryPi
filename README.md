@@ -2,7 +2,7 @@
 This project can be use as a RaspberryPi temperature sensor and water flow meter example. 
 
 ## YF-S201
-Rasperry Pi pinout:<br>
+### Rasperry Pi pinout:
 2 - 5volts<br>
 6 - GND<br>
 8  - Data (flowmeter1)<br>
@@ -14,7 +14,7 @@ $ cd YF-S201 && python main.py -pin 8
 `
 
 ## DS18B20
-You can install DS18B20 via this command line:<br>
+### install
 `
 $ cd DS18B20/ && bash install.sh
 `
@@ -28,13 +28,13 @@ Rasperry Pi pinout:<br>
 6 - GND<br>
 7 - Data<br>
 
-Run<br>
+### Run
 `
 $ cd DS18B20 && python main.py
 `
 
 ## InfluxDB
-You can install InfluxDB via this command line:<br>
+### Install
 `
 $ cd InfluxDB/ && bash install.sh
 `
@@ -55,7 +55,7 @@ $ cat Grafana/telemetry.json
 `
 
 ## PiOLED
-You can install PiOLED via this command line:<br>
+### Install
 `
 $ cd PiOLED/ && bash install.sh `<br>
 `
