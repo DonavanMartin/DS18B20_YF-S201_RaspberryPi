@@ -124,7 +124,7 @@ while True:
             },
             "time": current_time,
             "fields": {
-                "good_sample": db_good_sample,
+                "good_sample": float(db_good_sample),
                 "hz": db_hz,
                 "liter_by_min": db_liter_by_min
            }
