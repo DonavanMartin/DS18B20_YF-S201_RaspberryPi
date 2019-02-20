@@ -1,3 +1,0 @@
-vim
-python3-pip
-libow-dev
