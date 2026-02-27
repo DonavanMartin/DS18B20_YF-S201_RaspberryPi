@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.1] - 2026-02-27
+
+### Added
+- Sensor-type logging distinction in InfluxDB write confirmations and errors
+- `sensor_type` parameter in DBconnection.sendJSON() function for unified logging
+- [FLOW] and [TEMP] prefixes in success/error messages from InfluxDB module
+- `--debug` command-line argument for both YF-S201 and DS18B20 sensors
+- Conditional debug logging in InfluxDB module (success messages only print in debug mode)
+- DBconnection.sendJSON() to accept optional `debug` parameter
+- InfluxDB success messages now respect debug flag (errors always printed)
+- README.md updated with `--debug` usage examples
+
 ## [2.1.0] - 2026-02-27
 
 ### Added

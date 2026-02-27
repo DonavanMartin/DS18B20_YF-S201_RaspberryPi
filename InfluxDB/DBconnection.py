@@ -29,11 +29,17 @@ client = InfluxDBClient(
     timeout=10000  # 10 seconds
 )
 
-print(f"InfluxDB 1.8 Connection: OK → database '{INFLUX_DB}'")
+print("[DB] InfluxDB 1.8 Connection: OK → database '{INFLUX_DB}'")
 
-def sendJSON(json_data):
+def sendJSON(json_data, sensor_type="UNKNOWN", debug=False):
     """
     Sends data points to InfluxDB 1.8.
+    
+    Args:
+        json_data: Data formatted as list of dicts or single dict
+        sensor_type: Identifier for log messages (e.g., "TEMP", "FLOW")
+        debug: If True, print success messages; errors always printed
+    
     Accepts the same format as your previous code:
     - A list of dictionaries
     - A single dictionary
@@ -44,7 +50,7 @@ def sendJSON(json_data):
             "measurement": "temperature",
             "tags": {"room": "salon", "sensor": "temp01"},
             "fields": {"value": 22.5, "humidity": 48.3},
-            "time": datetime.datetime.utcnow()   # optional (default is now())
+            "time": datetime.datetime.now(datetime.timezone.utc)  # optional (default is now())
         },
         ...
     ]
@@ -72,10 +78,11 @@ def sendJSON(json_data):
 
         # Write to database
         client.write_points(points)
-        print(f"Write successful: {len(points)} point(s) sent to '{INFLUX_DB}'")
+        if debug:
+            print(f"[{sensor_type}] [DB] Write successful: {len(points)} point(s) sent to '{INFLUX_DB}'")
 
     except Exception as e:
-        print(f"Error sending to InfluxDB 1.8: {e}")
+        print(f"[{sensor_type}] [DB] [ERROR] Send failed: {e}")
         # You can add retry logic, logging, etc. here
 
 

@@ -2,7 +2,7 @@
 
 This project demonstrates how to use a Raspberry Pi with a temperature sensor (DS18B20) and water flow meter (YF-S201).
 
-**Version:** 2.1.0 | **Status:** Active  
+**Version:** 2.1.1 | **Status:** Active  
 **Tested on:** Raspberry Pi Zero  
 **Python Version:** Python 3.x  
 **License:** GPLv3 (modifications must be published publicly)
@@ -24,8 +24,14 @@ This project demonstrates how to use a Raspberry Pi with a temperature sensor (D
 
 ### Installation & Usage
 
+**Production mode (silent, errors only):**
 ```bash
-cd YF-S201 && python main.py -pin 8
+cd YF-S201 && python main.py -p 8
+```
+
+**Debug mode (verbose logging):**
+```bash
+cd YF-S201 && python main.py -p 8 --debug
 ```
 
 ---
@@ -68,8 +74,14 @@ cat /sys/bus/w1/devices/28-XXXXXXXXXXXX/w1_slave
 
 ### Running the Sensor
 
+**Production mode (silent, errors only):**
 ```bash
 cd DS18B20 && python3 main.py
+```
+
+**Debug mode (verbose logging):**
+```bash
+cd DS18B20 && python3 main.py --debug
 ```
 
 The sensor will read temperature values and optionally send them to InfluxDB.

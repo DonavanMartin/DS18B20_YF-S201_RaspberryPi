@@ -1,14 +1,16 @@
 #!/usr/bin/env python
-#DEBUG = True
-DEBUG = False
+# ════════════════════════════════════════════════════════════════════════════════
+# YF-S201 Water Flow Meter - Production/Debug Mode Configuration
+# ════════════════════════════════════════════════════════════════════════════════
+# --debug → Print all measurements and debug info to console
+# (no --debug) → Silent operation, only print on startup and errors
+
 import time, sys
 import RPi.GPIO as GPIO
 from datetime import datetime
 from datetime import timezone
 import os
-
-# Enable line buffering for immediate console output
-sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
+import argparse
 
 # Database Connection
 scriptPath = os.path.realpath(os.path.dirname(sys.argv[0]))
@@ -16,14 +18,17 @@ os.chdir(scriptPath)
 sys.path.append("../InfluxDB")
 import DBconnection
 
-INFLUX_ENABLE = 'yes'
+# Enable line buffering for immediate console output
+sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
 
-# Argument pin is required
-import argparse
+# Command-line argument parsing
 parser = argparse.ArgumentParser(description='YF-S201 measurement application for Raspberry Pi')
 requiredNamed = parser.add_argument_group('required named arguments')
 requiredNamed.add_argument('-p', '--pin', help='Data Raspberry Pin. Look at GPIO PINOUT', required=True)
+parser.add_argument('--debug', action='store_true', default=False, help='Enable debug mode with verbose logging')
 args = parser.parse_args()
+DEBUG = args.debug
+
 print("Port:",args.pin)
 
 if not args.pin:
@@ -38,6 +43,13 @@ except ValueError:
 if args.pin != '8' and args.pin != '10':
     print("Error pin must be 8 or 10. If you need another pin change this condition...")
     sys.exit()
+
+
+print(f"[START] YF-S201 Water Flow Meter starting on pin {args.pin}")
+if DEBUG:
+    print("[MODE] Debug mode - Verbose logging enabled")
+else:
+    print("[MODE] Production mode - Silent operation (errors only)")
 
 # Configuration
 pin_input = int(args.pin)
@@ -61,7 +73,7 @@ db_good_sample = 0
 db_hz = 0
 db_liter_by_min = 0
 
-print("Water Flow - YF-S201 measurment")
+print(f"[FLOW] [READY] YF-S201 ready - sampling every {sample_rate} seconds")
 
 while True:
     # Start / End
@@ -91,8 +103,9 @@ while True:
             current = v
 
         # Sums
-        print('-------------------------------------')
-        print('Current Time:', time.asctime(time.localtime()))
+        if DEBUG:  # Only print stats in debug mode
+            print('[FLOW] -------------------------------------')
+            print(f'[FLOW] Current Time: {time.asctime(time.localtime())}')
 
         secondes += sample_rate
         nb_samples = len(hz)
@@ -100,41 +113,44 @@ while True:
             average = sum(hz) / float(len(hz))
             # Calculate % of good samples in time range
             good_sample = sample_total_time/sample_rate
-            print("\t", round(sample_total_time, 4), '(sec) good sample')
+            if DEBUG:
+                print("[FLOW]\t", round(sample_total_time, 4), '(sec) good sample')
             db_good_sample = round(good_sample*100, 4)
-            print("\t", db_good_sample, '(%) good sample')
+            if DEBUG:
+                print("[FLOW]\t", db_good_sample, '(%) good sample')
             average = average * good_sample
         else:
             average = 0
+            db_good_sample = 0
         average_liters = average*m*sample_rate
         total_liters += average_liters
         db_hz = round(average, 4)
         db_liter_by_min = round(average_liters*(60/sample_rate), 4)
-        print("\t", db_hz, '(Hz) average')
-        print('\t', db_liter_by_min, '(L/min)')  # Display L/min instead of L/sec
-        print(round(total_liters, 4), '(L) total')
-        print(round(secondes/60, 4), '(min) total')
-        print('-------------------------------------')
+        if DEBUG:
+            print("[FLOW]\t", db_hz, '(Hz) average')
+            print('[FLOW]\t', db_liter_by_min, '(L/min)')  # Display L/min instead of L/sec
+            print('[FLOW]\t', round(total_liters, 4), '(L) total')
+            print('[FLOW]\t', round(secondes/60, 4), '(min) total')
+            print('[FLOW] -------------------------------------')
 
-        if INFLUX_ENABLE == 'yes':
-          # Format JSON for sending to InfluxDB
-          current_time = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
-          json_body = [{
-            "measurement": "temperature",
-            "tags": {
-                "serial": "WF-"+str(pin_input),
-                "type": "WaterFlow"
-            },
-            "time": current_time,
-            "fields": {
-                "good_sample": float(db_good_sample),
-                "hz": db_hz,
-                "liter_by_min": db_liter_by_min
-           }
-          }]
+        # Format JSON for sending to InfluxDB
+        current_time = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
+        json_body = [{
+          "measurement": "water_flow",
+          "tags": {
+              "serial": "WF-"+str(pin_input),
+              "type": "WaterFlow"
+          },
+          "time": current_time,
+          "fields": {
+              "good_sample": float(db_good_sample),
+              "hz": db_hz,
+              "liter_by_min": db_liter_by_min
+         }
+        }]
 
-          # Send data to InfluxDB
-          DBconnection.sendJSON(json_body)
+        # Send data to InfluxDB
+        DBconnection.sendJSON(json_body, sensor_type="FLOW", debug=DEBUG)
 
     except KeyboardInterrupt:
         print('\n CTRL+C - Exiting')
