@@ -6,6 +6,7 @@ Uses influxdb-python library (pip install influxdb)
 
 from influxdb import InfluxDBClient
 import datetime
+from datetime import timezone
 
 # ────────────────────────────────────────────────
 # CONFIGURATION – CUSTOMIZE AS NEEDED

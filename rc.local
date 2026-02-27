@@ -3,5 +3,5 @@
 
 # Or execute commands directly
 python /home/pi/DS18B20_YF-S201_RaspberryPi/DS18B20/main.py &
-python /home/pi/DS18B20_YF-S201_RaspberryPi/YF-S201/main.py &
+python /home/pi/DS18B20_YF-S201_RaspberryPi/YF-S201/main.py -p 8 &
 exit 0

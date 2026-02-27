@@ -2,9 +2,12 @@
 
 This project demonstrates how to use a Raspberry Pi with a temperature sensor (DS18B20) and water flow meter (YF-S201).
 
-**Tested on:** Raspberry Pi Zero 
-**Python Version:** Python 3.x
+**Version:** 2.0.0 | **Status:** Active  
+**Tested on:** Raspberry Pi Zero  
+**Python Version:** Python 3.x  
 **License:** GPLv3 (modifications must be published publicly)
+
+[Changelog](CHANGELOG.md)
 
 ---
 
@@ -109,6 +112,8 @@ Chronograf is the dedicated user interface for InfluxDB 1.x. It provides:
 - Data visualization
 - User authentication
 
+![Chronograf Interface](InfluxDB/Chronograf.png)
+
 **HTTP API (Alternative):**
 ```
 http://localhost:8086
@@ -163,6 +168,8 @@ cat Grafana/telemetry.json
 ```
 
 This file contains a pre-configured dashboard layout that you can import into Grafana.
+
+![Grafana Dashboard](Grafana/Grafana.png)
 
 ---
 

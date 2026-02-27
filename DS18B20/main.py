@@ -4,7 +4,11 @@ import glob
 import time
 import sys
 from datetime import datetime
-import os
+from datetime import timezone
+
+# Enable line buffering for immediate console output
+sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
+
 os.system('modprobe w1-gpio')
 #os.system('modprobe w1-therm')
 
@@ -67,7 +71,7 @@ try:
 
         if INFLUX_ENABLE == 'yes':
           # Format JSON for sending to InfluxDB
-          current_time = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+          current_time = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
           json_body = [{
             "measurement": "temperature",
             "tags": {

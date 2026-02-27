@@ -4,9 +4,13 @@ DEBUG = False
 import time, sys
 import RPi.GPIO as GPIO
 from datetime import datetime
+from datetime import timezone
+import os
+
+# Enable line buffering for immediate console output
+sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
 
 # Database Connection
-import os
 scriptPath = os.path.realpath(os.path.dirname(sys.argv[0]))
 os.chdir(scriptPath)
 sys.path.append("../InfluxDB")
@@ -84,7 +88,6 @@ while True:
 
                 if DEBUG:
                     print(round(new_hz, 4))  # Print Hz
-                    sys.stdout.flush()
             current = v
 
         # Sums
@@ -115,7 +118,7 @@ while True:
 
         if INFLUX_ENABLE == 'yes':
           # Format JSON for sending to InfluxDB
-          current_time = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+          current_time = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
           json_body = [{
             "measurement": "temperature",
             "tags": {
@@ -139,4 +142,3 @@ while True:
         sys.exit()
 GPIO.cleanup()
 print('Done')
-
