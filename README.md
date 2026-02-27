@@ -2,7 +2,7 @@
 
 This project demonstrates how to use a Raspberry Pi with a temperature sensor (DS18B20) and water flow meter (YF-S201).
 
-**Version:** 2.0.0 | **Status:** Active  
+**Version:** 2.1.0 | **Status:** Active  
 **Tested on:** Raspberry Pi Zero  
 **Python Version:** Python 3.x  
 **License:** GPLv3 (modifications must be published publicly)
@@ -200,6 +200,8 @@ Check service status:
 ```bash
 sudo systemctl status influxdb
 sudo systemctl status grafana-server
+sudo systemctl status chronograf
+
 ```
 
 ### Python Scripts at Boot
