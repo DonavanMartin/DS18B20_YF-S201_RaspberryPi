@@ -5,7 +5,7 @@ import time, sys
 import RPi.GPIO as GPIO
 from datetime import datetime
 
-#DBConnection
+# Database Connection
 import os
 scriptPath = os.path.realpath(os.path.dirname(sys.argv[0]))
 os.chdir(scriptPath)
@@ -14,7 +14,7 @@ import DBconnection
 
 INFLUX_ENABLE = 'yes'
 
-# argument pin is required
+# Argument pin is required
 import argparse
 parser = argparse.ArgumentParser(description='YF-S201 measurement application for Raspberry Pi')
 requiredNamed = parser.add_argument_group('required named arguments')
@@ -35,24 +35,24 @@ if args.pin != '8' and args.pin != '10':
     print("Error pin must be 8 or 10. If you need another pin change this condition...")
     sys.exit()
 
-# configurations
+# Configuration
 pin_input = int(args.pin)
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(pin_input, GPIO.IN)
 
-# variables
+# Variables
 total_liters = 0
 secondes = 0
 
 # Sampling
-sample_rate = 10  # Sampling each 10 secondes
+sample_rate = 10  # Sample each 10 seconds
 time_start = 0
 time_end = 0
 period = 0
-hz = []       # Frequency !important!
+hz = []       # Frequency (important!)
 m = 0.0021    # See linear.pdf
 
-# data 
+# Data
 db_good_sample = 0
 db_hz = 0
 db_liter_by_min = 0
@@ -60,9 +60,9 @@ db_liter_by_min = 0
 print("Water Flow - YF-S201 measurment")
 
 while True:
-    # start / end 
+    # Start / End
     time_start = time.time()
-    init_time_start = time_start # undetect last edge 
+    init_time_start = time_start  # undetect last edge
     time_end = time_start + sample_rate
     hz = []
     sample_total_time = 0
@@ -76,41 +76,41 @@ while True:
             t = time.time()
             v = GPIO.input(pin_input)
             if current != v and current == edge:
-                period = t - time_start # Impulsion period
+                period = t - time_start  # Impulse period
                 new_hz = 1/period
-                hz.append(new_hz)               # Period = 1/period
+                hz.append(new_hz)  # Period = 1/period
                 sample_total_time += t - time_start
                 time_start = t
-               
+
                 if DEBUG:
-                    print(round(new_hz, 4))     # Print hz
+                    print(round(new_hz, 4))  # Print Hz
                     sys.stdout.flush()
             current = v
 
         # Sums
         print('-------------------------------------')
-        print('Current Time:',time.asctime(time.localtime()))
+        print('Current Time:', time.asctime(time.localtime()))
 
         secondes += sample_rate
         nb_samples = len(hz)
-        if nb_samples >0:
+        if nb_samples > 0:
             average = sum(hz) / float(len(hz))
-            # Calcul % of good sample in time range
+            # Calculate % of good samples in time range
             good_sample = sample_total_time/sample_rate
-            print("\t", round(sample_total_time,4),'(sec) good sample')
-            db_good_sample = round(good_sample*100,4)
-            print("\t", db_good_sample,'(%) good sample')
+            print("\t", round(sample_total_time, 4), '(sec) good sample')
+            db_good_sample = round(good_sample*100, 4)
+            print("\t", db_good_sample, '(%) good sample')
             average = average * good_sample
         else:
             average = 0
         average_liters = average*m*sample_rate
         total_liters += average_liters
-        db_hz = round(average,4)
-        db_liter_by_min= round(average_liters*(60/sample_rate),4)
-        print("\t", db_hz,'(hz) average')
-        print('\t', db_liter_by_min,'(L/min)') # Display L/min instead of L/sec
-        print(round(total_liters,4),'(L) total')
-        print(round(secondes/60,4), '(min) total')
+        db_hz = round(average, 4)
+        db_liter_by_min = round(average_liters*(60/sample_rate), 4)
+        print("\t", db_hz, '(Hz) average')
+        print('\t', db_liter_by_min, '(L/min)')  # Display L/min instead of L/sec
+        print(round(total_liters, 4), '(L) total')
+        print(round(secondes/60, 4), '(min) total')
         print('-------------------------------------')
 
         if INFLUX_ENABLE == 'yes':
