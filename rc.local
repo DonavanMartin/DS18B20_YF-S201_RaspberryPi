@@ -1,0 +1,7 @@
+#!/bin/bash
+# rc.local - Exécuté au boot (après démarrage réseau)
+
+# Ou directement des commandes
+python /home/pi/DS18B20_YF-S201_RaspberryPi/DS18B20/main.py &
+python /home/pi/DS18B20_YF-S201_RaspberryPi/YF-S201/main.py &
+exit 0

@@ -48,7 +48,7 @@ secondes = 0
 sample_rate = 10  # Sampling each 10 secondes
 time_start = 0
 time_end = 0
-period = 0;
+period = 0
 hz = []       # Frequency !important!
 m = 0.0021    # See linear.pdf
 
@@ -61,7 +61,7 @@ print("Water Flow - YF-S201 measurment")
 
 while True:
     # start / end 
-    time_start = time.time();
+    time_start = time.time()
     init_time_start = time_start # undetect last edge 
     time_end = time_start + sample_rate
     hz = []
@@ -73,28 +73,28 @@ while True:
 
     try:
         while time.time() <= time_end:
-            t = time.time();
+            t = time.time()
             v = GPIO.input(pin_input)
             if current != v and current == edge:
                 period = t - time_start # Impulsion period
                 new_hz = 1/period
                 hz.append(new_hz)               # Period = 1/period
                 sample_total_time += t - time_start
-                time_start = t;
+                time_start = t
                
                 if DEBUG:
                     print(round(new_hz, 4))     # Print hz
                     sys.stdout.flush()
-            current = v;
+            current = v
 
         # Sums
         print('-------------------------------------')
         print('Current Time:',time.asctime(time.localtime()))
 
         secondes += sample_rate
-        nb_samples = len(hz);
+        nb_samples = len(hz)
         if nb_samples >0:
-            average = sum(hz) / float(len(hz));
+            average = sum(hz) / float(len(hz))
             # Calcul % of good sample in time range
             good_sample = sample_total_time/sample_rate
             print("\t", round(sample_total_time,4),'(sec) good sample')
@@ -103,9 +103,9 @@ while True:
             average = average * good_sample
         else:
             average = 0
-        average_liters = average*m*sample_rate;
+        average_liters = average*m*sample_rate
         total_liters += average_liters
-        db_hz = round(average,4);
+        db_hz = round(average,4)
         db_liter_by_min= round(average_liters*(60/sample_rate),4)
         print("\t", db_hz,'(hz) average')
         print('\t', db_liter_by_min,'(L/min)') # Display L/min instead of L/sec
