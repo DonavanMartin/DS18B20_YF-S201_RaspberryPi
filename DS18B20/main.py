@@ -10,6 +10,8 @@ import glob
 import time
 import sys
 import argparse
+import threading
+from queue import Queue
 from datetime import datetime
 from datetime import timezone
 
@@ -68,47 +70,113 @@ def convert_to_f(temp_c):
 
 def read_ext_temp(sensor_file):
   '''
-  Read temperature from DS18B20 thermometer
+  Read temperature from DS18B20 thermometer (optimized version)
+  Reads only until finding the temperature line, using efficient parsing.
   '''
-  f = open(sensor_file, 'r')
-  lines = f.readlines()  # Read only first sample in the file
-  f.close()
-  temp_line = [l for l in lines if 't=' in l]
-  ext_temp_c_raw = temp_line[0].replace('=', ' ').split()[-1]
-  return convert_from_raw(ext_temp_c_raw)
+  try:
+    with open(sensor_file, 'r') as f:
+      for line in f:
+        # Temperature is at the end of the last line, format: "...t=20500"
+        if 't=' in line:
+          # Extract value after "t=" without string splitting
+          temp_raw = line.split('t=')[-1].strip()
+          return convert_from_raw(float(temp_raw))
+  except Exception as e:
+    print(f"[TEMP] [ERROR] Failed to read {sensor_file}: {e}")
+    return None
+  
+  return None
+
+def read_temp_threaded(device_info, result_queue):
+  '''
+  Thread worker function to read a single sensor's temperature
+  device_info: [sensor_file, type, serial]
+  result_queue: queue to store results
+  '''
+  sensor_file, sensor_type, serial = device_info
+  temp = read_ext_temp(sensor_file)
+  result_queue.put((serial, sensor_type, temp))
+
+# ════════════════════════════════════════════════════════════════════════════════
+# Main loop with fixed-rate sampling (4 samples per second = 250ms interval)
+# Read ALL sensors in PARALLEL using threads, send in SINGLE batch
+# ════════════════════════════════════════════════════════════════════════════════
+SAMPLE_INTERVAL = 0.25  # 250ms for 4 samples/second
+last_sample_time = time.time()
 
 try:
   while True:
-    time.sleep(1)  # Do not oversample (disk space constraint)
-    device, nb_device = getDevices()
-    for x in range(0, nb_device):
-        ext_temp = read_ext_temp(device[x][0])
+    current_time_float = time.time()
+    time_since_last_sample = current_time_float - last_sample_time
+    
+    # Only sample if enough time has passed (don't wait if it's already time)
+    if time_since_last_sample >= SAMPLE_INTERVAL:
+      device, nb_device = getDevices()
+      
+      # ════════════════════════════════════════════════════════════════════════
+      # Parallel sensor reading using threads
+      # ════════════════════════════════════════════════════════════════════════
+      result_queue = Queue()
+      threads = []
+      
+      # Start a thread for each sensor
+      for x in range(0, nb_device):
+        t = threading.Thread(
+          target=read_temp_threaded,
+          args=(device[x], result_queue),
+          daemon=True
+        )
+        t.start()
+        threads.append(t)
+      
+      # Wait for all threads to complete
+      for t in threads:
+        t.join()
+      
+      # Collect all readings in a single JSON body
+      json_body = []
+      current_time_str = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
+      
+      # Process results from queue
+      while not result_queue.empty():
+        serial, sensor_type, ext_temp = result_queue.get()
+        
+        # Skip if temperature reading failed
+        if ext_temp is None:
+          print(f"[TEMP] [ERROR] Failed to read temperature from {serial}")
+          continue
+        
         if DEBUG:
-          print( "Serial:{0} --  Type:{1} --  Temp C: {2} -- Temp F: {3}".format(device[x][2], device[x][1], ext_temp, convert_to_f(ext_temp)))
+          print( "Serial:{0} --  Type:{1} --  Temp C: {2} -- Temp F: {3}".format(serial, sensor_type, ext_temp, convert_to_f(ext_temp)))
 
-        if INFLUX_ENABLE == 'yes':
-          try:
-            # Format JSON for sending to InfluxDB
-            current_time = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
-            json_body = [{
-              "measurement": "temperature",
-              "tags": {
-                  "serial": device[x][2],
-                  "type": device[x][1]
-              },
-              "time": current_time,
-              "fields": {
-                  "value": ext_temp
-             }
-            }]
-
-            # Send data to InfluxDB
-            DBconnection.sendJSON(json_body, sensor_type="TEMP", debug=DEBUG)
-            if DEBUG:
-                print(f"[TEMP] → Sent to InfluxDB for {device[x][2]}")
-          except Exception as e:
-            # Always print errors even in production mode
-            print(f"[TEMP] [ERROR] InfluxDB send failed: {e}")
+        # Add this reading to the batch
+        json_body.append({
+          "measurement": "temperature",
+          "tags": {
+              "serial": serial,
+              "type": sensor_type
+          },
+          "time": current_time_str,
+          "fields": {
+              "value": ext_temp
+         }
+        })
+      
+      # Send ALL readings in ONE request
+      if INFLUX_ENABLE == 'yes' and len(json_body) > 0:
+        try:
+          DBconnection.sendJSON(json_body, sensor_type="TEMP", debug=DEBUG)
+          if DEBUG:
+              print(f"[TEMP] → Sent {len(json_body)} sensor(s) to InfluxDB in single batch")
+        except Exception as e:
+          # Always print errors even in production mode
+          print(f"[TEMP] [ERROR] InfluxDB send failed: {e}")
+      
+      # Update last sample time (use float time, not string)
+      last_sample_time = current_time_float
+    else:
+      # Not time yet - sleep briefly without busy-waiting
+      time.sleep(0.01)  # Check again in 10ms
 
 except KeyboardInterrupt:
   print("[TEMP] [STOP] DS18B20 - User interrupted (Ctrl+C)")

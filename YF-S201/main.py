@@ -61,7 +61,7 @@ total_liters = 0
 secondes = 0
 
 # Sampling
-sample_rate = 10  # Sample each 10 seconds
+sample_rate = 1  # Sample each 1 second
 time_start = 0
 time_end = 0
 period = 0
@@ -75,6 +75,23 @@ db_liter_by_min = 0
 
 print(f"[FLOW] [READY] YF-S201 ready - sampling every {sample_rate} seconds")
 
+# Add diagnostic mode for first 3 seconds
+print("[FLOW] [DEBUG] Reading raw GPIO values for 3 seconds...")
+time_end_diag = time.time() + 3
+gpio_samples = []
+while time.time() < time_end_diag:
+    val = GPIO.input(pin_input)
+    gpio_samples.append(val)
+    time.sleep(0.01)
+
+if DEBUG or len(set(gpio_samples)) == 1:
+    print(f"[FLOW] [WARN] GPIO always reads: {gpio_samples[0]}")
+    if len(set(gpio_samples)) == 1:
+        print("[FLOW] [ERROR] GPIO is stuck! Check wiring or sensor power")
+        print("[FLOW] Continuing anyway...")
+else:
+    print(f"[FLOW] [OK] GPIO is changing: {len(set(gpio_samples))} states detected")
+
 while True:
     # Start / End
     time_start = time.time()
@@ -86,6 +103,9 @@ while True:
     # Edge
     current = GPIO.input(pin_input)
     edge = current # Rising edge / Falling edge
+    
+    if DEBUG:
+        print(f"[FLOW] [SAMPLE] Starting 1s sample - Initial state: {current}")
 
     try:
         while time.time() <= time_end:
@@ -99,8 +119,12 @@ while True:
                 time_start = t
 
                 if DEBUG:
-                    print(round(new_hz, 4))  # Print Hz
+                    print(f"[FLOW] [EDGE] {round(new_hz, 4)} Hz")
             current = v
+            time.sleep(0.0001)  # Sleep 100µs to reduce CPU usage
+        
+        if DEBUG and len(hz) == 0:
+            print("[FLOW] [WARN] No edges detected in this sample")
 
         # Sums
         if DEBUG:  # Only print stats in debug mode

@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-02-27
+
+### Added
+- GPIO diagnostic startup test for YF-S201 (3-second GPIO state check at startup)
+- Parallel sensor reading for DS18B20 using Python threading (Queue-based architecture)
+- Thread worker function `read_temp_threaded()` for concurrent sensor reads
+- Enhanced edge detection output with formatted Hz values in debug mode
+
+### Improved
+- DS18B20 performance: 6 sensors now read in parallel (~750ms vs sequential 4.5s = 6× speedup)
+- `read_ext_temp()` function uses line-by-line parsing with early exit optimization
+- YF-S201 sample interval reduced from 10s → 1s for better water flow data granularity
+- Fixed-rate sampling using time.time() for accurate microsecond-precision polling
+- CPU optimization: YF-S201 reduced loop sleep from 1ms → 100µs
+- install.sh now detects modern Raspberry Pi OS boot paths (/boot/firmware/config.txt)
+- install.sh prevents duplicate w1-gpio overlay entries with grep check
+- install.sh provides better user feedback with [INFO], [ERROR], [SUCCESS] prefixes
+- Batch JSON writing: DS18B20 sends all sensor readings in single InfluxDB request
+- README.md updated with dual installation methods (automated vs raspi-config manual)
+
+### Fixed
+- YF-S201 debug output now includes [FLOW] logger prefixes for consistency
+- YF-S201 sample startup state now logged when DEBUG=True
+- README.md troubleshooting section now references /boot/firmware/config.txt paths
+
+### Changed
+- **BREAKING**: YF-S201 sample_rate changed from 10s → 1s (improves measurement fidelity)
+
 ## [2.1.1] - 2026-02-27
 
 ### Added

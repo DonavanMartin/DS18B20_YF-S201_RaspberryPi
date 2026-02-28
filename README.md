@@ -52,17 +52,32 @@ Configure the 1-Wire interface:
 cd DS18B20 && bash install.sh
 ```
 
-This adds the necessary GPIO configuration to `/boot/config.txt`.
-
 **Required reboot:**
 ```bash
 sudo reboot
 ```
 
+#### Setup 1-Wire (raspi-config)
+
+```bash
+sudo raspi-config
+```
+
+Navigate to:
+1. **Interface Options**
+2. **1-Wire**
+3. Select **Yes**
+4. Select **Finish**
+5. Select **Yes** when asked to reboot
+
+#### Verify Installation
+
 After reboot, verify the sensor is detected:
 ```bash
 cat /sys/bus/w1/devices/28-XXXXXXXXXXXX/w1_slave
 ```
+
+The output should show temperature data with `t=` value (in millidegrees).
 
 ### Raspberry Pi Pinout
 
@@ -258,7 +273,7 @@ tail -f /var/log/syslog | grep python
 
 1. Verify the GPIO configuration was applied:
 ```bash
-grep dtoverlay /boot/config.txt
+grep dtoverlay /boot/firmware/config.txt
 ```
 
 2. Check if the 1-Wire module is loaded:
